@@ -48,6 +48,7 @@ class FieldElement:
         return self.__class__(num, self.prime)
 
     def __truediv__(self, other: FieldElement) -> FieldElement:
+        # Using Fermat's theorem : n^(p-1) % p = 1 for n > 0 and p being any prime number
         if self.prime != other.prime:
             raise TypeError('Cannot divide two numbers in different Fields')
 
