@@ -1,3 +1,4 @@
+from pybitcoin.ecc import FieldElement
 import unittest
 
 
@@ -48,3 +49,7 @@ class FieldElementTest(unittest.TestCase):
         a = FieldElement(4, 31)
         b = FieldElement(11, 31)
         self.assertEqual(a ** -4 * b, FieldElement(13, 31))
+
+
+if __name__ == '__main__':
+    unittest.main()
