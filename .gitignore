@@ -2,3 +2,5 @@
 .idea/
 
 *.pyc
+
+bitcoin_from_scratch_python.egg-info/
