@@ -1,8 +1,12 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import Optional
 
 
 class FieldElement:
+    """
+    Implementation of Finite Field elements and operations
+    """
     def __init__(self, num: int, prime: int) -> None:
         if num >= prime or num < 0:
             error = 'Num {} not in field range 0 to {}'.format(num, prime - 1)
@@ -56,62 +60,82 @@ class FieldElement:
         return self.__class__(num, self.prime)
 
 
-class Point:
-    def __init__(self, x, y, a, b):
-        self.x = x
-        self.y = y
-        self.a = a
-        self.b = b
-        if self.x is None and self.y is None:
-            return
-        if self.y ** 2 != self.x ** 3 + a * self.x + b:
-            raise ValueError('({}, {}) is not on the curve'.format(x, y))
-
-    def __repr__(self):
-        if self.x is None:
-            return 'Point(infinity)'
-        else:
-            return 'Point({},{})_{}_{}'.format(self.x, self.y, self.a, self.b)
+@dataclass
+class EllipticCurve:
+    """
+    Points on the elliptic curve satisfy y^2 = x^3 + a*x + b.
+    """
+    a: Optional[int, FieldElement]
+    b: Optional[int, FieldElement]
 
     def __eq__(self, other):
-        return self.x == other.x and \
-               self.y == other.y and \
-               self.a == other.a and \
+        return self.a == other.a and \
                self.b == other.b
 
     def __ne__(self, other):
         return not (self == other)
 
-    def __add__(self, other):
-        if self.a != other.a or self.b != other.b:
+
+class Point:
+    """ An integer point (x,y) on a Curve """
+    def __init__(self, x: Optional[int, None, FieldElement], y: Optional[int, None, FieldElement],
+                 curve: EllipticCurve):
+        self.x = x
+        self.y = y
+        self.curve = curve
+        if self.x is None and self.y is None:
+            return
+        if self.y ** 2 != self.x ** 3 + self.curve.a * self.x + self.curve.b:
+            raise ValueError('({}, {}) is not on the curve'.format(x, y))
+
+    @property
+    def INF(self) -> Point:
+        # Infinity point
+        return self.__class__(None, None, self.curve)
+
+    def __repr__(self) -> str:
+        if self == self.INF:
+            return 'Point(infinity)_curve_{}_{}'.format(self.curve.a, self.curve.b)
+        else:
+            return 'Point({},{})_curve_{}_{}'.format(self.x, self.y, self.curve.a, self.curve.b)
+
+    def __eq__(self, other: Point) -> bool:
+        return self.x == other.x and \
+               self.y == other.y and \
+               self.curve == other.curve
+
+    def __ne__(self, other: Point) -> bool:
+        return not (self == other)
+
+    def __add__(self, other: Point) -> Point:
+        if self.curve != other.curve:
             raise TypeError('Points {}, {} are not on the same curve'.format
                             (self, other))
-        if self.x is None:
+        if self == self.INF:
             # Handling infinity point case
+            # P + 0 = P
             return other
 
-        if other.x is None:
+        if other == self.INF:
             # Handling infinity point case
+            # 0 + P = P
             return self
 
         if self.x == other.x and self.y != other.y:
             # Handling vertical line case
-            return self.__class__(None, None, self.a, self.b)
-
-        if self.x != other.x:
-            # Handling general slant line case with valid slope intersecting at a point
-            slope = (other.y - self.y) / (other.x - self.x)
-            result_x = pow(slope, 2) - self.x - other.x
-            result_y = slope * (self.x - result_x) - self.y
-            return self.__class__(result_x, result_y, self.a, self.b)
+            # P + (- P) = 0
+            return self.INF
 
         if self == other and self.y == 0 * self.x:
             # Handling vertical tangent line at y=0
-            return self.__class__(None, None, self.a, self.b)
+            return self.INF
 
-        if self == other:
-            # Handling general tangent line to elliptic curve intersecting at one point
-            slope = (3 * pow(self.x, 2) + self.a) / (2 * self.y)
-            x = pow(slope, 2) - 2 * self.x
-            y = slope * (self.x - x) - self.y
-            return self.__class__(x, y, self.a, self.b)
+        if self.x == other.x:  # (self.y = other.y is guaranteed too per "vertical line case" check)
+            # Handling general tangent line intersecting at one point
+            slope = (3 * pow(self.x, 2) + self.curve.a) / (2 * self.y)
+        else:
+            # Handling general slant line case with valid slope intersecting at any three points
+            slope = (other.y - self.y) / (other.x - self.x)
+        result_x = pow(slope, 2) - self.x - other.x
+        result_y = slope * (self.x - result_x) - self.y
+        return self.__class__(result_x, result_y, self.curve)

@@ -1,4 +1,4 @@
-from ecc import FieldElement, Point
+from ecc import FieldElement, Point, EllipticCurve
 
 if __name__ == "__main__":
     f7 = FieldElement(3, 13)
@@ -12,7 +12,8 @@ if __name__ == "__main__":
     print(f7 ** -3)
     print(f7 != None)
 
-    p1 = Point(-1, -1, 5, 7)
-    p2 = Point(18, 77, 5, 7)
-    inf = Point(None, None, 5, 7)
+    curve = EllipticCurve(a=5, b=7)
+    p1 = Point(-1, 1, curve)
+    p2 = Point(18, 77, curve)
+    inf = Point(None, None, curve)
     print(p1 + p2)
