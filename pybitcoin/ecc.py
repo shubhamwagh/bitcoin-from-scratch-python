@@ -68,11 +68,11 @@ class EllipticCurve:
     a: Optional[int, FieldElement]
     b: Optional[int, FieldElement]
 
-    def __eq__(self, other):
+    def __eq__(self, other: EllipticCurve) -> bool:
         return self.a == other.a and \
                self.b == other.b
 
-    def __ne__(self, other):
+    def __ne__(self, other: EllipticCurve) -> bool:
         return not (self == other)
 
 
@@ -88,13 +88,8 @@ class Point:
         if self.y ** 2 != self.x ** 3 + self.curve.a * self.x + self.curve.b:
             raise ValueError('({}, {}) is not on the curve'.format(x, y))
 
-    @property
-    def INF(self) -> Point:
-        # Infinity point
-        return self.__class__(None, None, self.curve)
-
     def __repr__(self) -> str:
-        if self == self.INF:
+        if self == self._INF:
             return 'Point(infinity)_curve_{}_{}'.format(self.curve.a, self.curve.b)
         else:
             return 'Point({},{})_curve_{}_{}'.format(self.x, self.y, self.curve.a, self.curve.b)
@@ -111,12 +106,12 @@ class Point:
         if self.curve != other.curve:
             raise TypeError('Points {}, {} are not on the same curve'.format
                             (self, other))
-        if self == self.INF:
+        if self == self._INF:
             # Handling infinity point case
             # P + 0 = P
             return other
 
-        if other == self.INF:
+        if other == self._INF:
             # Handling infinity point case
             # 0 + P = P
             return self
@@ -124,11 +119,11 @@ class Point:
         if self.x == other.x and self.y != other.y:
             # Handling vertical line case
             # P + (- P) = 0
-            return self.INF
+            return self._INF
 
         if self == other and self.y == 0 * self.x:
             # Handling vertical tangent line at y=0
-            return self.INF
+            return self._INF
 
         if self.x == other.x:  # (self.y = other.y is guaranteed too per "vertical line case" check)
             # Handling general tangent line intersecting at one point
@@ -139,3 +134,8 @@ class Point:
         result_x = pow(slope, 2) - self.x - other.x
         result_y = slope * (self.x - result_x) - self.y
         return self.__class__(result_x, result_y, self.curve)
+
+    @property
+    def _INF(self) -> Point:
+        # Infinity point
+        return self.__class__(None, None, self.curve)
