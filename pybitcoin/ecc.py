@@ -59,6 +59,10 @@ class FieldElement:
         num = (self.num * pow(other.num, self.prime - 2, self.prime)) % self.prime
         return self.__class__(num, self.prime)
 
+    def __rmul__(self, coefficient):
+        num = (self.num * coefficient) % self.prime
+        return self.__class__(num=num, prime=self.prime)
+
 
 @dataclass
 class EllipticCurve:
@@ -98,9 +102,9 @@ class Point:
 
     def __repr__(self) -> str:
         if self == self._INF:
-            return 'Point(infinity)_curve_{}_{}'.format(self.curve.a, self.curve.b)
+            return 'Point(infinity)_{}_{}'.format(self.curve.a, self.curve.b)
         else:
-            return 'Point({},{})_curve_{}_{}'.format(self.x, self.y, self.curve.a, self.curve.b)
+            return 'Point({},{})_{}_{}'.format(self.x, self.y, self.curve.a, self.curve.b)
 
     def __eq__(self, other: Point) -> bool:
         return self.x == other.x and \
