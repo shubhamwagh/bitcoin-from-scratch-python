@@ -76,7 +76,7 @@ class EllipticCurve:
     def __repr__(self) -> str:
         if self.a == 0 * self.b:  # hack to check for zero in case if self.a is of type FieldElement
             return "Elliptic Curve: y^2 = x^3 + {}".format(self.b)
-        elif self.b == 0 * self.a: # hack to check for zero in case if self.b is of type FieldElement
+        elif self.b == 0 * self.a:  # hack to check for zero in case if self.b is of type FieldElement
             return "Elliptic Curve: y^2 = x^3 + {}x".format(self.a)
         else:
             return "Elliptic Curve: y^2 = x^3 + {}x + {}".format(self.a, self.b)
@@ -135,7 +135,7 @@ class Point:
             # P + (- P) = 0
             return self._INF
 
-        if self == other and self.y == 0 * self.x: # hack to check for zero in case if self.y is of type FieldElement
+        if self == other and self.y == 0 * self.x:  # hack to check for zero in case if self.y is of type FieldElement
             # Handling vertical tangent line at y=0
             return self._INF
 
@@ -148,6 +148,17 @@ class Point:
         result_x = pow(slope, 2) - self.x - other.x
         result_y = slope * (self.x - result_x) - self.y
         return self.__class__(result_x, result_y, self.curve)
+
+    def __rmul__(self, scalar_coefficient: int) -> Point:
+        coef = scalar_coefficient
+        current = self
+        result = self._INF
+        while coef:
+            if coef & 1:
+                result += current
+            current += current
+            coef >>= 1
+        return result
 
     @property
     def _INF(self) -> Point:

@@ -1,20 +1,9 @@
 from ecc import FieldElement, Point, EllipticCurve
 
 if __name__ == "__main__":
-    f7 = FieldElement(3, 13)
-    f11 = FieldElement(7, 13)
-    print(f7)
-    print(f11)
-    print(f7 + f11)
-    print(f7 - f11)
-    print(f7 * f11)
-    print(f7 / f11)
-    print(f7 ** -3)
-    print(f7 != None)
-
-    curve = EllipticCurve(a=0, b=7)
+    a = FieldElement(0, 223)
+    b = FieldElement(7, 223)
+    curve = EllipticCurve(a, b)
     print(curve)
-    p1 = Point(-1, 1, curve)
-    p2 = Point(18, 77, curve)
-    inf = Point(None, None, curve)
-    print(p1 + p2)
+    p1 = Point(x=FieldElement(47, 223), y=FieldElement(71, 223), curve=curve)
+    inf = Point(x=None, y=None, curve=curve)
