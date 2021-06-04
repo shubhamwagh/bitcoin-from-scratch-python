@@ -68,6 +68,14 @@ class EllipticCurve:
     a: Optional[int, FieldElement]
     b: Optional[int, FieldElement]
 
+    def __repr__(self):
+        if self.a == 0:
+            return "Elliptic Curve: y^2 = x^3 + {}".format(self.b)
+        elif self.b == 0:
+            return "Elliptic Curve: y^2 = x^3 + {}x".format(self.a)
+        else:
+            return "Elliptic Curve: y^2 = x^3 + {}x + {}".format(self.a, self.b)
+
     def __eq__(self, other: EllipticCurve) -> bool:
         return self.a == other.a and \
                self.b == other.b

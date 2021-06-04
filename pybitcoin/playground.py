@@ -12,7 +12,8 @@ if __name__ == "__main__":
     print(f7 ** -3)
     print(f7 != None)
 
-    curve = EllipticCurve(a=5, b=7)
+    curve = EllipticCurve(a=0, b=7)
+    print(curve)
     p1 = Point(-1, 1, curve)
     p2 = Point(18, 77, curve)
     inf = Point(None, None, curve)
