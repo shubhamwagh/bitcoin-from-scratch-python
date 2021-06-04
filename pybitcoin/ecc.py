@@ -7,6 +7,7 @@ class FieldElement:
     """
     Implementation of Finite Field elements and operations
     """
+
     def __init__(self, num: int, prime: int) -> None:
         if num >= prime or num < 0:
             error = 'Num {} not in field range 0 to {}'.format(num, prime - 1)
@@ -73,9 +74,9 @@ class EllipticCurve:
     b: Optional[int, FieldElement]
 
     def __repr__(self) -> str:
-        if self.a == 0:
+        if self.a == 0 * self.b:  # hack to check for zero in case if self.a is of type FieldElement
             return "Elliptic Curve: y^2 = x^3 + {}".format(self.b)
-        elif self.b == 0:
+        elif self.b == 0 * self.a: # hack to check for zero in case if self.b is of type FieldElement
             return "Elliptic Curve: y^2 = x^3 + {}x".format(self.a)
         else:
             return "Elliptic Curve: y^2 = x^3 + {}x + {}".format(self.a, self.b)
@@ -90,6 +91,7 @@ class EllipticCurve:
 
 class Point:
     """ An integer point (x,y) on a Curve """
+
     def __init__(self, x: Optional[int, None, FieldElement], y: Optional[int, None, FieldElement],
                  curve: EllipticCurve):
         self.x = x
@@ -133,7 +135,7 @@ class Point:
             # P + (- P) = 0
             return self._INF
 
-        if self == other and self.y == 0 * self.x:
+        if self == other and self.y == 0 * self.x: # hack to check for zero in case if self.y is of type FieldElement
             # Handling vertical tangent line at y=0
             return self._INF
 
