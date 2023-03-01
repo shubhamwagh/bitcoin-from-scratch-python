@@ -164,3 +164,31 @@ class Point:
     def _INF(self) -> Point:
         # Infinity point
         return self.__class__(None, None, self.curve)
+
+
+class S256Field(FieldElement):
+    P = 2 ** 256 - 2 ** 32 - 977
+
+    def __init__(self, num: int, prime: int = P):
+        super().__init__(num=num, prime=prime)
+
+    def __repr__(self) -> str:
+        return '{:x}'.format(self.num).zfill(64)
+
+
+class S256Point(Point):
+    A = 0  # elliptic curve parameter
+    B = 7  # elliptic curve parameter
+    curve = EllipticCurve(a=S256Field(num=A), b=S256Field(num=B))
+
+    N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141  # Order of the group
+
+    def __init__(self, x: Optional[int, FieldElement], y: Optional[int, FieldElement], curve: EllipticCurve = curve):
+        if type(x) == int:
+            super().__init__(x=S256Field(num=x), y=S256Field(num=y), curve=curve)
+        else:
+            super().__init__(x=x, y=y, curve=curve)
+
+    def __rmul__(self, coefficient):
+        coeff = coefficient % self.N
+        return super().__rmul__(coeff)
